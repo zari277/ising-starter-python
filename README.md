@@ -45,7 +45,7 @@ These are just recommendations - there are plenty of other GUI-based application
 
 2. Navigate to the folder you would like to use, then use:
   ```bash
-  git clone git@github.com:{{your-github-username}}/ising && cd ising
+  git clone git@github.com:{{your-github-username}}/ising-starter-python ising && cd ising
   ```
 
 3. If you are using conda (recommended), use this to install required packages:
@@ -92,14 +92,12 @@ These are just recommendations - there are plenty of other GUI-based application
 
 Coming Soon!
 
-## Understanding (and Running) the Simulation
+## Understanding the Simulation
 
-Coming Soon!
+
 
 ## To-Dos
 
-* Add automatic plots for Mag, CV, and Sus after simulation
-* Add analysis starter code and Jupyter Notebook template
 * Add Windows Powershell instructions
 * Add more info on Simulation structure
 * Optimize (make code faster)
