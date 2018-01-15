@@ -106,11 +106,12 @@ def get_plot_values(temp,Msamp,Esamp,num_analysis): #only for plotting at end
         return False
 
 def plot_graphs(temp_arr,M_mean_arr,M_std_arr,E_mean_arr,E_std_arr): #plot graphs at end
-    plt.figure(2)
-    plt.errorbar(temp_arr, M_mean_arr, yerr=M_std_arr, fmt='o')
+    plt.figure(1)
+    plt.ylims(0,1)
+    plt.errorbar(temp_arr, M_mean_arr, yerr=M_std_arr, uplims=True, lolims=True, fmt='o')
     plt.xlabel('Temperature')
     plt.ylabel('Magnetization')
-    plt.figure(3)
+    plt.figure(2)
     plt.errorbar(temp_arr, E_mean_arr, yerr=E_std_arr, fmt='o')
     plt.xlabel('Temperature')
     plt.ylabel('Energy')
