@@ -44,7 +44,7 @@ def run_ising(N,T,num_steps,num_burnin,flip_prop,J,B):
 
         #Sum up our variables of interest, normalize by N^2
         M = float(np.sum(spin))/float(N**2)
-        Msamp.append(np.absolute(M))
+        Msamp.append(M)
 
         #Divide by two because of double counting
         E = float(-J*(np.sum((spin*neighbors)))/2.0 - float(B_step)*M)/float(N**2)
@@ -63,4 +63,4 @@ def run_ising(N,T,num_steps,num_burnin,flip_prop,J,B):
         #Perform the transitions
         spin = spin*transitions
 
-    return Msamp,Esamp
+    return Msamp, Esamp, spin

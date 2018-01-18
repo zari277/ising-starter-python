@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm #fancy progress bar generator
 from ising import run_ising #import run_ising function from ising.py
 
-def calculate_and_save_values(index,temp,filename,Msamp,Esamp,num_analysis):
+def calculate_and_save_values(index,temp,filename,Msamp,Esamp,spin,num_analysis):
     try:
         #calculate statistical values
         M_mean = np.average(Msamp[-num_analysis:])
@@ -69,13 +69,14 @@ def run_simulation(t_min,t_max,t_step,n,num_steps,num_analysis,num_burnin,j,b,fl
 
         try:
             #run the Ising model
-            Msamp, Esamp = run_ising(n,temp,num_steps,num_burnin,flip_prop,j,b)
+            Msamp, Esamp, spin = run_ising(n,temp,num_steps,num_burnin,flip_prop,j,b)
 
             #get and save statistical values
-            if calculate_and_save_values(index, temp, filename, Msamp, Esamp, num_analysis):
+            if calculate_and_save_values(index,temp,filename,Msamp,Esamp,spin,num_analysis):
+
                 if plots:
                     #for plotting
-                    M_mean, E_mean, M_std, E_std = get_plot_values(temp, Msamp,Esamp,num_analysis)
+                    M_mean, E_mean, M_std, E_std = get_plot_values(temp,Msamp,Esamp,num_analysis)
                     temp_arr.append(temp)
                     M_mean_arr.append(M_mean)
                     E_mean_arr.append(E_mean)
@@ -107,8 +108,7 @@ def get_plot_values(temp,Msamp,Esamp,num_analysis): #only for plotting at end
 
 def plot_graphs(temp_arr,M_mean_arr,M_std_arr,E_mean_arr,E_std_arr): #plot graphs at end
     plt.figure(1)
-    plt.ylims(0,1)
-    plt.errorbar(temp_arr, M_mean_arr, yerr=M_std_arr, uplims=True, lolims=True, fmt='o')
+    plt.errorbar(temp_arr, np.absolute(M_mean_arr), yerr=M_std_arr, fmt='o')
     plt.xlabel('Temperature')
     plt.ylabel('Magnetization')
     plt.figure(2)

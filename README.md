@@ -94,8 +94,15 @@ Coming Soon!
 
 ## Understanding the Simulation
 
+There are three important python files in this simulation: `main.py`, `ising.py`, and `annealing.py`
 
+`main.py` is the file you have to run for the simulation. The code in this file takes in the input parameters, runs the Ising model for each temperature step, gets the relevant data, saves it, and gives you a set of nice plots at the end. This is a lot, so we've broken this down into different functions to make it easier to understand/change. Here are the two most important ones:
 
+* `run_simulation`: takes in all the input variables and runs the simulation.
+
+* `calculate_and_save_values`: takes in the energy, magnetization, and spin values from the Ising code, calculates the appropriate statistical values, and saves them to a CSV file. **This is where you should implement code to calculate the other values you are interested in**.
+
+`ising.py` calculates the Ising model at a certain temperature
 
 ## To-Dos
 
