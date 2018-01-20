@@ -54,7 +54,7 @@ These are just recommendations - there are plenty of other GUI-based application
   ```
 
   If you have a standalone version of Python 3 installed and are using pip, use this instead (you may need to be a superuser to install Pip packages):
-  ```bash
+ ```bash
   pip install -r requirements.txt
   ```
 
