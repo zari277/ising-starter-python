@@ -2,6 +2,11 @@ import numpy as np
 from scipy import signal
 from annealing import B_anneal, T_anneal
 
+try:
+    __IPYTHON__
+except:
+    from tqdm import tqdm
+
 def run_ising(N,T,num_steps,num_burnin,flip_prop,J,B):
 
     # Description of parameters:
@@ -26,11 +31,21 @@ def run_ising(N,T,num_steps,num_burnin,flip_prop,J,B):
     # Generate a random initial configuration
     spin = np.random.choice([-1,1],(N,N))
 
-    steps = range(num_steps) 
+    try:
+        __IPYTHON__
+        steps = range(num_steps)
+    except:
+        steps = tqdm(range(num_steps))
 
     # Evolve the system
     for step in steps:
-        
+
+        try:
+            __IPYTHON__
+        except:
+            steps.set_description("Working on T = %.2f" % T)
+            steps.refresh() # to show immediately the update
+
         #implement annealing in annealing.py file
         T_step = T_anneal(T, step, num_steps, num_burnin)
         B_step = B_anneal(B, step, num_steps, num_burnin)
