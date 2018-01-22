@@ -181,7 +181,7 @@ def get_temp_array(t_min,t_max,t_step):
 def compute_autocorrelation(spin):
     n = len(spin)
     corr_array = []
-    for k in range(1,n/2):
+    for k in range(1,int(n/2)):
         col_mean, row_mean = spin.mean(axis=0),spin.mean(axis=1)
         #compute r values for rows and cols
         r_col = [np.multiply(spin[j,:]-col_mean,spin[(j+k)%n,:]-col_mean) for j in range(1,n)]
