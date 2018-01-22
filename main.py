@@ -19,7 +19,7 @@ def calculate_and_save_values(Msamp,Esamp,spin,num_analysis,index,temp,data_file
         data_array = [M_mean,M_std,E_mean,E_std]
 
         #write data to CSV file
-        header_array = ['Temperature','Magnetization Mean','Magnetization Std Dev','Energy Mean','Energy Std Dev']
+        header_array = ['Temperature','Magnetizatio n Mean','Magnetization Std Dev','Energy Mean','Energy Std Dev']
         append_data_to_file(data_filename, header_array) if index == 0 else None
         append_data_to_file(data_filename, data_array, temp)
 
@@ -181,11 +181,11 @@ def get_temp_array(t_min,t_max,t_step):
 def compute_autocorrelation(spin):
     n = len(spin)
     corr_array = []
-    for k in range(1,n):
+    for k in range(1,n/2):
         col_mean, row_mean = spin.mean(axis=0),spin.mean(axis=1)
         #compute r values for rows and cols
-        r_col = [np.multiply(spin[j,:]-col_mean,spin[(j+k)%n,:]-col_mean) for j in range(1,int(n/2))]
-        r_row = [np.multiply(spin[:,j]-row_mean,spin[:,(j+k)%n]-row_mean) for j in range(1,int(n/2))]
+        r_col = [np.multiply(spin[j,:]-col_mean,spin[(j+k)%n,:]-col_mean) for j in range(1,n)]
+        r_row = [np.multiply(spin[:,j]-row_mean,spin[:,(j+k)%n]-row_mean) for j in range(1,n)]
         #normalize r values
         r_col = np.divide(r_col,float(n))
         r_row = np.divide(r_row,float(n))

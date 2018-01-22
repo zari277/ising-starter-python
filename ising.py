@@ -51,7 +51,7 @@ def run_ising(N,T,num_steps,num_burnin,flip_prop,J,B):
         B_step = B_anneal(B, step, num_steps, num_burnin)
 
         #Calculating the total spin of neighbouring cells
-        neighbors = signal.convolve2d(spin,conv_mat,mode='same',boundary='circular')
+        neighbors = signal.convolve2d(spin,conv_mat,mode='same',boundary='wrap')
 
         #Sum up our variables of interest, normalize by N^2
         M = float(np.sum(spin))/float(N**2)
