@@ -33,7 +33,7 @@ If you don't have Python installed yet, I would highly recommend using the **Ana
 
 Once this is installed on your computer, you will have Python 3 ready to go, as well as important packages like NumPy and SciPy. You can view these packages and install new ones using the [Anaconda Navigator](https://docs.anaconda.com/anaconda/navigator/) (need to install this separately).
 
-In order to edit and run your code, I would recommend [Spyder (Scientific PYthon Development EnviRonment)](https://pythonhosted.org/spyder/) (I know, horrible acronym, but the IDE makes up for it). It should be really easy to edit your code and run it through this environment.
+In order to edit and run your code, I would recommend [Spyder (Scientific PYthon Development EnviRonment)](https://pythonhosted.org/spyder/) (I know, horrible acronym, but the IDE makes up for it). It should be really easy to edit your code and run it through this environment. **NOTE**: The IPython shell in Spyder does not support nested progress bars, so you will only see one when you run the simulation. In order to see both, you will need to change your run configuration to run in a normal Python shell.
 
 Another optional but cool program you can use is [Jupyter Notebook](http://jupyter.org/) (comes pre-installed with Anaconda). These notebooks support Python code, as well as Markdown and LaTeX, so you can keep all of your code organized and easily testable (hint: use for easier data analysis!). You should be able to open this through Anaconda Navigator.
 
@@ -54,7 +54,7 @@ These are just recommendations - there are plenty of other GUI-based application
   ```
 
   If you have a standalone version of Python 3 installed and are using pip, use this instead (you may need to be a superuser to install Pip packages):
-  ```bash
+ ```bash
   pip install -r requirements.txt
   ```
 

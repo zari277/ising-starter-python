@@ -9,18 +9,28 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm #fancy progress bar generator
 from ising import run_ising #import run_ising function from ising.py
 
-def calculate_and_save_values(index,temp,filename,Msamp,Esamp,spin,num_analysis):
+def calculate_and_save_values(Msamp,Esamp,spin,num_analysis,index,temp,data_filename,corr_filename):
     try:
         #calculate statistical values
         M_mean = np.average(Msamp[-num_analysis:])
         E_mean = np.average(Esamp[-num_analysis:])
         M_std = np.std(Msamp[-num_analysis:])
         E_std = np.std(Esamp[-num_analysis:])
+        data_array = [M_mean,M_std,E_mean,E_std]
+
         #write data to CSV file
-        header_array = ['Temperature','Magnetization Mean','Magnetization Std Dev','Energy Mean','Energy Std Dev']
-        data_array = [temp,M_mean,M_std,E_mean,E_std]
-        append_data_to_file(filename, temp, header_array) if index == 0 else None
-        append_data_to_file(filename, temp, data_array)
+        header_array = ['Temperature','Magnetizatio n Mean','Magnetization Std Dev','Energy Mean','Energy Std Dev']
+        append_data_to_file(data_filename, header_array) if index == 0 else None
+        append_data_to_file(data_filename, data_array, temp)
+
+        #get correlation function
+        corr = compute_autocorrelation(spin)
+
+        #write correlation function to CSV file
+        header_array = ['Temperature','K','Spatial Spin Correlation']
+        append_data_to_file(corr_filename, header_array) if index == 0 else None
+        [append_data_to_file(corr_filename, corr_value, temp) for corr_value in corr]
+
         return True
 
     except:
@@ -51,15 +61,15 @@ def run_simulation(t_min,t_max,t_step,n,num_steps,num_analysis,num_burnin,j,b,fl
 
     T = get_temp_array(t_min, t_max, t_step)
 
-    filename = get_filename(output)
+    data_filename, corr_filename = get_filenames(output)
 
-    write_sim_parameters(filename,n,num_steps,num_analysis,num_burnin,j,b,flip_prop)
+    write_sim_parameters(data_filename,corr_filename,n,num_steps,num_analysis,num_burnin,j,b,flip_prop)
 
     if plots:
         #initialize vars for plotting values
         temp_arr, M_mean_arr, E_mean_arr, M_std_arr, E_std_arr = [],[],[],[],[]
 
-    print('\nSimulation Started! Data will be written to ' + filename + '\n')
+    print('\nSimulation Started! Data will be written to ' + data_filename + '\n')
 
     temp_range = tqdm(T) #set fancy progress bar range
     for index, temp in enumerate(temp_range):
@@ -72,7 +82,7 @@ def run_simulation(t_min,t_max,t_step,n,num_steps,num_analysis,num_burnin,j,b,fl
             Msamp, Esamp, spin = run_ising(n,temp,num_steps,num_burnin,flip_prop,j,b)
 
             #get and save statistical values
-            if calculate_and_save_values(index,temp,filename,Msamp,Esamp,spin,num_analysis):
+            if calculate_and_save_values(Msamp,Esamp,spin,num_analysis,index,temp,data_filename,corr_filename):
 
                 if plots:
                     #for plotting
@@ -90,7 +100,7 @@ def run_simulation(t_min,t_max,t_step,n,num_steps,num_analysis,num_burnin,j,b,fl
         except:
             logging.error("Temp="+str(temp)+": Simulation Failed. No Data Written")
 
-    print('\n\nSimulation Finished! Data written to '+filename)
+    print('\n\nSimulation Finished! Data written to '+ data_filename)
 
     if plots:
         plot_graphs(temp_arr, M_mean_arr, E_mean_arr, M_std_arr, E_std_arr)
@@ -108,7 +118,8 @@ def get_plot_values(temp,Msamp,Esamp,num_analysis): #only for plotting at end
 
 def plot_graphs(temp_arr,M_mean_arr,M_std_arr,E_mean_arr,E_std_arr): #plot graphs at end
     plt.figure(1)
-    plt.errorbar(temp_arr, np.absolute(M_mean_arr), yerr=M_std_arr, fmt='o')
+    plt.ylim(0,1)
+    plt.errorbar(temp_arr, np.absolute(M_mean_arr), yerr=M_std_arr, uplims=True, lolims=True,fmt='o')
     plt.xlabel('Temperature')
     plt.ylabel('Magnetization')
     plt.figure(2)
@@ -126,20 +137,27 @@ def check_step_values(num_steps,num_analysis,num_burnin): #simulation size check
         raise ValueError('num_analysis cannot be greater than available num_steps after burnin. Exiting simulation.')
         sys.exit()
 
-def get_filename(dirname): #make data folder if doesn't exist, then specify filename
+def get_filenames(dirname): #make data folder if doesn't exist, then specify filename
     try:
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        filename = os.path.join(dirname,str(time.strftime("%Y%m%d-%H%M%S"))+".csv")
+        data_filename = os.path.join(dirname,'data_'+str(time.strftime("%Y%m%d-%H%M%S"))+".csv")
+        corr_filename = os.path.join(dirname,'corr_'+str(time.strftime("%Y%m%d-%H%M%S"))+".csv")
         #Write simulation parameters to file
-        return filename
+        return data_filename, corr_filename
     except:
         raise ValueError('Directory name not valid. Exiting simulation.')
         sys.exit()
 
-def write_sim_parameters(filename,n,num_steps,num_analysis,num_burnin,j,b,flip_prop):
+def write_sim_parameters(data_filename,corr_filename,n,num_steps,num_analysis,num_burnin,j,b,flip_prop):
     try:
-        with open(filename,'w') as csv_file:
+        with open(data_filename,'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+            #Write simulations parameters to CSV file
+            writer.writerow(['Lattice Size (NxN)','Total Steps','Steps Used in Analysis','Burnin Steps','Interaction Strength','Applied Mag Field','Spin Prop'])
+            writer.writerow([n,num_steps,num_analysis,num_burnin,j,b,flip_prop])
+            writer.writerow([])
+        with open(corr_filename,'w') as csv_file:
             writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
             #Write simulations parameters to CSV file
             writer.writerow(['Lattice Size (NxN)','Total Steps','Steps Used in Analysis','Burnin Steps','Interaction Strength','Applied Mag Field','Spin Prop'])
@@ -154,17 +172,37 @@ def get_temp_array(t_min,t_max,t_step):
         raise ValueError('T_min cannot be greater than T_max. Exiting Simulation')
         sys.exit()
     try:
-        T = np.arange(t_min,t_max,t_step)
+        T = np.arange(t_min,t_max,t_step).tolist()
         return T
     except:
         raise ValueError('Error creating temperature array. Exiting simulation.')
         sys.exit()
 
-def append_data_to_file(filename,temp,data_array):
+def compute_autocorrelation(spin):
+    n = len(spin)
+    corr_array = []
+    for k in range(1,int(n/2)):
+        col_mean, row_mean = spin.mean(axis=0),spin.mean(axis=1)
+        #compute r values for rows and cols
+        r_col = [np.multiply(spin[j,:]-col_mean,spin[(j+k)%n,:]-col_mean) for j in range(1,n)]
+        r_row = [np.multiply(spin[:,j]-row_mean,spin[:,(j+k)%n]-row_mean) for j in range(1,n)]
+        #normalize r values
+        r_col = np.divide(r_col,float(n))
+        r_row = np.divide(r_row,float(n))
+        #calculate corr for k and add it to array
+        corr = (r_col.mean() + r_row.mean())/2.0
+        corr_array.append([k,corr])
+    return corr_array
+
+def append_data_to_file(filename,data_array,temp=False):
     try:
         with open(filename,'a') as csv_file: #appends to existing CSV File
             writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
-            writer.writerow(data_array)
+            if temp:
+                writer.writerow([temp]+data_array)
+            else:
+                writer.writerow(data_array)
+
     except:
         logging.error("Temp={0}: Error Writing to File".format(temp))
 
